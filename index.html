@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>تقسيم — نموذج تفاعلي</title>
+<style>
+  :root{
+    --bg:#0b0c10;
+    --device:#16181f;
+    --device-2:#1f222c;
+    --screen:#f6f7fb;
+    --ink:#14161d;
+    --muted:#6b7280;
+    --line:#e7e9f0;
+    --brand:#4f46e5;
+    --brand-2:#6d5efc;
+    --green:#0fa968;
+    --green-soft:#e6f7ef;
+    --shadow:0 30px 60px -20px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"SF Arabic","Segoe UI","Noto Sans Arabic",Tahoma,sans-serif;
+    background:
+      radial-gradient(900px 420px at 15% 0%, #14161d 0%, transparent 60%),
+      radial-gradient(900px 420px at 85% 100%, #14161d 0%, transparent 60%),
+      #000;
+    color:#e8e9ef;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 16px 60px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .intro{
+    text-align:center;
+    max-width:420px;
+    margin-bottom:26px;
+  }
+  .intro .kicker{
+    font-size:12px;letter-spacing:2px;color:var(--brand-2);
+    font-weight:700;text-transform:uppercase;margin-bottom:8px;
+  }
+  .intro h1{font-size:22px;font-weight:800;margin-bottom:6px;color:#fff}
+  .intro p{font-size:14px;color:#9aa0ad;line-height:1.6}
+
+  /* ===== physical POS terminal chrome ===== */
+  .terminal-wrap{ position:relative; }
+  .terminal-shadow{
+    position:absolute; left:50%; bottom:-22px; transform:translateX(-50%);
+    width:78%; height:26px; border-radius:50%;
+    background:radial-gradient(closest-side, rgba(255,255,255,.10), transparent 75%);
+    filter:blur(2px);
+  }
+  .device{
+    position:relative;
+    width:min(320px,100%);
+    background:linear-gradient(160deg,#fbfcfe,#e7e9ee 60%,#dcdfe6);
+    border-radius:38px;
+    padding:10px 10px 16px;
+    box-shadow:
+      0 40px 70px -30px rgba(20,22,30,.45),
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -2px 6px rgba(0,0,0,.06);
+    border:1px solid #d7dae1;
+  }
+  /* colored header strip like a physical terminal top */
+  .device-head{
+    position:relative;
+    height:64px;
+    margin:0 0 8px;
+    border-radius:26px 26px 14px 14px;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 16px;
+    box-shadow:inset 0 -6px 12px rgba(0,0,0,.12), inset 0 2px 0 rgba(255,255,255,.25);
+    overflow:hidden;
+  }
+  .device-head::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(120deg, rgba(255,255,255,.22), transparent 40%);
+  }
+  .device-logo{
+    display:flex;align-items:center;gap:8px;color:#fff;font-weight:800;font-size:13px;letter-spacing:.3px;
+    position:relative;z-index:1;
+  }
+  .device-logo .mark{
+    width:22px;height:22px;border-radius:8px;background:rgba(255,255,255,.22);
+    display:grid;place-items:center;
+  }
+  .device-cam{
+    display:flex;align-items:center;gap:10px;position:relative;z-index:1;
+  }
+  .speaker{ display:flex; gap:3px; }
+  .speaker i{ width:3px;height:9px;border-radius:2px;background:rgba(255,255,255,.55); }
+  .camdot{
+    width:9px;height:9px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #4b5563, #0e1116 70%);
+    box-shadow:0 0 0 2px rgba(255,255,255,.35);
+  }
+
+  .device-top{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 6px 8px;color:#8b90a0;font-size:11px;font-weight:700;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+  .brandtag{display:flex;align-items:center;gap:6px}
+  .brandtag b{color:#4b5160;font-weight:800;letter-spacing:.4px}
+
+  .screen{
+    background:var(--screen);
+    border-radius:16px;
+    color:var(--ink);
+    overflow:hidden;
+    min-height:480px;
+    display:flex;flex-direction:column;
+    position:relative;
+    box-shadow:inset 0 0 0 1px #d7dae1, inset 0 6px 14px rgba(0,0,0,.05);
+  }
+  /* bottom physical detail: printer slot + LED */
+  .device-foot{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    padding-top:12px;
+  }
+  .printer-slot{
+    width:96px;height:6px;border-radius:4px;
+    background:linear-gradient(180deg,#c7cbd4,#9aa0ad);
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.35);
+  }
+  .led{
+    width:6px;height:6px;border-radius:50%;background:#22c55e;
+    box-shadow:0 0 6px #22c55e;
+  }
+  .scr-pad{padding:22px 20px 20px;display:flex;flex-direction:column;flex:1}
+
+  .label{font-size:13px;color:var(--muted);font-weight:600}
+  .amount{font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1.1;margin-top:2px}
+  .amount .cur{font-size:18px;font-weight:700;color:var(--muted);margin-inline-start:6px}
+  .divider{height:1px;background:var(--line);margin:18px 0}
+
+  .hint{font-size:14px;color:var(--muted);margin-bottom:14px;font-weight:600}
+
+  .methods{display:flex;flex-direction:column;gap:11px;margin-top:auto}
+  .method{
+    border:1.5px solid var(--line);
+    background:#fff;border-radius:16px;
+    padding:16px 16px;
+    display:flex;align-items:center;gap:13px;
+    font-size:16px;font-weight:700;color:var(--ink);
+    cursor:pointer;transition:.18s;text-align:right;width:100%;
+  }
+  .method:hover{border-color:#c9ccd8}
+  .method:active{transform:scale(.99)}
+  .method .ico{
+    width:40px;height:40px;border-radius:11px;display:grid;place-items:center;
+    background:#eef0f6;flex:none;
+  }
+  .method.feature{
+    border-color:transparent;
+    background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    color:#fff;box-shadow:0 12px 24px -10px rgba(79,70,229,.7);
+  }
+  .method.feature .ico{background:rgba(255,255,255,.18)}
+  .method.feature .sub{color:rgba(255,255,255,.8)}
+  .method .m-txt{display:flex;flex-direction:column;gap:2px}
+  .method .sub{font-size:12px;font-weight:600;color:var(--muted)}
+  .badge{margin-inline-start:auto;font-size:11px;font-weight:800;background:#fff;color:var(--brand);padding:3px 8px;border-radius:20px}
+
+  svg{display:block}
+
+  /* count screen */
+  .center-block{flex:1;display:flex;flex-direction:column;justify-content:center}
+  .q{font-size:19px;font-weight:800;text-align:center;margin-bottom:4px}
+  .q-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:26px}
+  .stepper{
+    display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:26px;
+  }
+  .step-btn{
+    width:54px;height:54px;border-radius:50%;border:1.5px solid var(--line);
+    background:#fff;font-size:26px;font-weight:700;color:var(--brand);
+    cursor:pointer;display:grid;place-items:center;transition:.15s;
+  }
+  .step-btn:hover{background:#f3f4fb}
+  .step-btn:active{transform:scale(.94)}
+  .step-btn:disabled{opacity:.35;cursor:not-allowed}
+  .count-num{font-size:58px;font-weight:800;min-width:78px;text-align:center}
+  .share-card{
+    background:var(--brand);background:linear-gradient(135deg,var(--brand),var(--brand-2));
+    color:#fff;border-radius:18px;padding:18px;text-align:center;margin-bottom:18px;
+  }
+  .share-card .s-lbl{font-size:13px;opacity:.85;font-weight:600}
+  .share-card .s-amt{font-size:34px;font-weight:800;margin-top:4px}
+
+  .btn{
+    width:100%;border:none;border-radius:16px;padding:17px;
+    font-size:16px;font-weight:800;cursor:pointer;transition:.18s;
+    font-family:inherit;
+  }
+  .btn-primary{background:var(--brand);color:#fff;box-shadow:0 12px 24px -10px rgba(79,70,229,.7)}
+  .btn-primary:active{transform:scale(.99)}
+  .btn-ghost{background:transparent;color:var(--muted);font-weight:700;padding:12px;font-size:14px}
+
+  /* pay screen */
+  .progress-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .progress-row .who{font-size:15px;font-weight:800}
+  .progress-row .of{font-size:13px;color:var(--muted);font-weight:600}
+  .bar{height:8px;border-radius:6px;background:var(--line);overflow:hidden;margin-bottom:22px}
+  .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),var(--brand-2));border-radius:6px;transition:width .5s ease}
+
+  .pay-due{text-align:center;margin:6px 0 20px}
+  .pay-due .label{margin-bottom:4px}
+  .pay-due .amount{font-size:42px}
+
+  .tap-zone{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    border:2px dashed var(--line);border-radius:18px;padding:20px;margin-bottom:16px;
+    cursor:pointer;transition:.2s;text-align:center;
+  }
+  .tap-zone:hover{border-color:var(--brand);background:#fafaff}
+  .tap-zone .ring{
+    width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
+    background:#eef0fb;color:var(--brand);position:relative;
+  }
+  .tap-zone.live .ring::before,.tap-zone.live .ring::after{
+    content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--brand);
+    animation:pulse 1.6s ease-out infinite;
+  }
+  .tap-zone.live .ring::after{animation-delay:.8s}
+  @keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.7);opacity:0}}
+  .tap-zone .tz-title{font-size:16px;font-weight:800}
+  .tap-zone .tz-sub{font-size:13px;color:var(--muted);font-weight:600}
+
+  .payers{display:flex;justify-content:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+  .chip{
+    width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+    background:#eef0f6;color:var(--muted);font-weight:800;font-size:13px;border:2px solid transparent;
+  }
+  .chip.paid{background:var(--green-soft);color:var(--green);border-color:#b9ead0}
+  .chip.active{border-color:var(--brand);color:var(--brand);background:#fff}
+
+  /* processing + done overlays */
+  .overlay{
+    position:absolute;inset:0;background:var(--screen);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    padding:30px;text-align:center;
+  }
+  .spinner{
+    width:56px;height:56px;border-radius:50%;
+    border:4px solid var(--line);border-top-color:var(--brand);
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .check{
+    width:84px;height:84px;border-radius:50%;background:var(--green-soft);
+    display:grid;place-items:center;animation:pop .35s ease;
+  }
+  @keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+  .ov-title{font-size:20px;font-weight:800}
+  .ov-sub{font-size:14px;color:var(--muted);font-weight:600;line-height:1.6}
+
+  .summary{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;width:100%;margin:4px 0 6px}
+  .summary .row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;font-weight:600}
+  .summary .row .v{font-weight:800}
+  .summary .row + .row{border-top:1px solid var(--line)}
+
+  .editbar{
+    display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+    border-radius:12px;padding:8px 12px;margin-top:14px;
+  }
+  .editbar span{font-size:12px;color:var(--muted);font-weight:700}
+  .editbar input{
+    flex:1;border:none;outline:none;font-family:inherit;font-size:15px;font-weight:800;
+    text-align:left;color:var(--ink);background:transparent;
+  }
+  .foot{margin-top:18px;font-size:12px;color:#6b7280;text-align:center;max-width:380px;line-height:1.6}
+  .hide{display:none!important}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+  <div class="intro">
+    <div class="kicker">PROTOTYPE</div>
+    <h1>خاصية «تقسيم»</h1>
+    <p>طريقة الدفع الثالثة، مدمجة داخل جهاز نقاط البيع. اضغط على الشاشة وجرّب الرحلة كاملة.</p>
+  </div>
+
+  <div class="terminal-wrap">
+    <div class="device">
+      <div class="device-head">
+        <div class="device-logo">
+          <span class="mark"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.5 15.5"/><path d="M8.5 8.5 20 20"/></svg></span>
+          <span>تقسيم</span>
+        </div>
+        <div class="device-cam">
+          <div class="speaker"><i></i><i></i><i></i><i></i></div>
+          <div class="camdot"></div>
+        </div>
+      </div>
+
+      <div class="device-top">
+        <div class="brandtag"><span class="dot"></span><b>متصل</b></div>
+        <span id="clock">12:35</span>
+      </div>
+
+      <div class="screen" id="screen"><!-- rendered by JS --></div>
+
+      <div class="device-foot">
+        <div class="printer-slot"></div>
+        <div class="led"></div>
+      </div>
+    </div>
+    <div class="terminal-shadow"></div>
+  </div>
+
+  <p class="foot">نموذج توضيحي لتجربة المستخدم — الأرقام والعمليات وهمية لغرض العرض فقط.</p>
+
+<script>
+(function(){
+  var screen = document.getElementById('screen');
+  var state = {
+    total: 150,
+    people: 2,
+    paidCount: 0,
+    view: 'idle' // idle | count | pay | processing | done
+  };
+
+  function money(n){
+    return Number(n).toLocaleString('en-US',{maximumFractionDigits:2});
+  }
+  function share(){
+    return state.total / state.people;
+  }
+
+  function render(){
+    if(state.view==='idle') return renderIdle();
+    if(state.view==='count') return renderCount();
+    if(state.view==='pay') return renderPay();
+    if(state.view==='done') return renderDone();
+  }
+
+  function renderIdle(){
+    screen.innerHTML =
+      '<div class="scr-pad">'+
+        '<div class="label">المبلغ المطلوب</div>'+
+        '<div class="amount">'+money(state.total)+'<span class="cur">ريال</span></div>'+
+        '<div class="editbar">'+
+          '<span>عدّل المبلغ للتجربة</span>'+
+          '<input id="amtIn" type="number" min="1" value="'+state.total+'" inputmode="decimal" />'+
+        '</div>'+
+        '<div class="divider"></div>'+
+        '<div class="hint">اختر طريقة الدفع</div>'+
+        '<div class="methods">'+
+          method('cash','كاش','الدفع نقدًا', false)+
+          method('card','شبكة','بطاقة مدى أو ائتمانية', false)+
+          '<button class="method feature" data-act="split">'+
+            '<span class="ico">'+iconSplit('#fff')+'</span>'+
+            '<span class="m-txt"><span>تقسيم</span><span class="sub">قسّم الفاتورة على عدة أشخاص</span></span>'+
+            '<span class="badge">جديد</span>'+
+          '</button>'+
+        '</div>'+
+      '</div>';
+
+    var amt = document.getElementById('amtIn');
+    amt.addEventListener('change', function(){
+      var v = parseFloat(this.value);
+      state.total = (isNaN(v)||v<1) ? 1 : v;
+      render();
+    });
+    screen.querySelectorAll('.method').forEach(function(b){
+      b.addEventListener('click', function(){
+        if(this.dataset.act==='split'){ state.view='count'; render(); }
+        else { flashSimple(); }
+      });
+    });
+  }
+
+  function method(act,title,sub,feature){
+    var ico = act==='cash' ? iconCash() : iconCard();
+    return '<button class="method'+(feature?' feature':'')+'" data-act="'+act+'">'+
+      '<span class="ico">'+ico+'</span>'+
+      '<span class="m-txt"><span>'+title+'</span><span class="sub">'+sub+'</span></span>'+
+    '</button>';
+  }
+
+  function flashSimple(){
+    // brief processing then back to idle for the non-split methods
+    overlayProcessing('جارٍ المعالجة…');
+    setTimeout(function(){
+      overlayDoneSimple();
+    }, 1100);
+  }
+
+  function renderCount(){
+    var s = share();
+    screen.innerHTML =
+      '<div class="scr-pad">'+
+        '<div class="center-block">'+
+          '<div class="q">على كم شخص نقسّم الفاتورة؟</div>'+
+          '<div class="q-sub">المبلغ الكلي '+money(state.total)+' ريال</div>'+
+          '<div class="stepper">'+
+            '<button class="step-btn" id="minus" '+(state.people<=2?'disabled':'')+'>−</button>'+
+            '<div class="count-num">'+state.people+'</div>'+
+            '<button class="step-btn" id="plus" '+(state.people>=12?'disabled':'')+'>+</button>'+
+          '</div>'+
+          '<div class="share-card">'+
+            '<div class="s-lbl">حصة كل شخص</div>'+
+            '<div class="s-amt">'+money(s)+' ريال</div>'+
+          '</div>'+
+          '<button class="btn btn-primary" id="confirm">تأكيد وبدء الدفع</button>'+
+          '<button class="btn btn-ghost" id="back">رجوع</button>'+
+        '</div>'+
+      '</div>';
+
+    document.getElementById('minus').addEventListener('click',function(){
+      if(state.people>2){state.people--;render();}
+    });
+    document.getElementById('plus').addEventListener('click',function(){
+      if(state.people<12){state.people++;render();}
+    });
+    document.getElementById('confirm').addEventListener('click',function(){
+      state.paidCount=0; state.view='pay'; render();
+    });
+    document.getElementById('back').addEventListener('click',function(){
+      state.view='idle'; render();
+    });
+  }
+
+  function renderPay(){
+    var s = share();
+    var current = state.paidCount + 1;
+    var pct = Math.round((state.paidCount/state.people)*100);
+
+    var chips='';
+    for(var i=1;i<=state.people;i++){
+      var cls = i<=state.paidCount ? 'paid' : (i===current ? 'active' : '');
+      var inner = i<=state.paidCount ? iconTick('#0fa968') : i;
+      chips += '<div class="chip '+cls+'">'+inner+'</div>';
+    }
+
+    screen.innerHTML =
+      '<div class="scr-pad">'+
+        '<div class="progress-row">'+
+          '<span class="who">الشخص '+current+' من '+state.people+'</span>'+
+          '<span class="of">تم تحصيل '+money(state.paidCount*s)+' من '+money(state.total)+' ريال</span>'+
+        '</div>'+
+        '<div class="bar"><i style="width:'+pct+'%"></i></div>'+
+        '<div class="payers">'+chips+'</div>'+
+        '<div class="pay-due">'+
+          '<div class="label">المطلوب من هذا الشخص</div>'+
+          '<div class="amount">'+money(s)+'<span class="cur">ريال</span></div>'+
+        '</div>'+
+        '<div class="tap-zone" id="tap">'+
+          '<div class="ring">'+iconWave('#4f46e5')+'</div>'+
+          '<div class="tz-title">قرّب البطاقة أو الجوال</div>'+
+          '<div class="tz-sub">اضغط هنا لمحاكاة الدفع</div>'+
+        '</div>'+
+        '<button class="btn btn-ghost" id="cancel">إلغاء التقسيم</button>'+
+      '</div>';
+
+    document.getElementById('tap').addEventListener('click', payOne);
+    document.getElementById('cancel').addEventListener('click',function(){
+      state.view='idle'; state.paidCount=0; render();
+    });
+  }
+
+  function payOne(){
+    var tz = document.getElementById('tap');
+    if(tz) tz.classList.add('live');
+    overlayProcessing('جارٍ معالجة دفعة الشخص '+(state.paidCount+1)+'…');
+    setTimeout(function(){
+      state.paidCount++;
+      // approved flash
+      overlayApproved(function(){
+        if(state.paidCount>=state.people){ state.view='done'; render(); }
+        else { state.view='pay'; render(); }
+      });
+    }, 1200);
+  }
+
+  function renderDone(){
+    var s = share();
+    screen.innerHTML =
+      '<div class="scr-pad">'+
+        '<div class="center-block" style="gap:16px">'+
+          '<div style="display:flex;justify-content:center"><div class="check">'+iconTick('#0fa968',40)+'</div></div>'+
+          '<div class="ov-title" style="text-align:center">اكتمل الدفع</div>'+
+          '<div class="ov-sub" style="text-align:center">تم تحصيل كامل الفاتورة بنجاح من جميع الأطراف.</div>'+
+          '<div class="summary">'+
+            '<div class="row"><span>إجمالي الفاتورة</span><span class="v">'+money(state.total)+' ريال</span></div>'+
+            '<div class="row"><span>عدد الأشخاص</span><span class="v">'+state.people+'</span></div>'+
+            '<div class="row"><span>حصة كل شخص</span><span class="v">'+money(s)+' ريال</span></div>'+
+          '</div>'+
+          '<button class="btn btn-primary" id="again">فاتورة جديدة</button>'+
+        '</div>'+
+      '</div>';
+    document.getElementById('again').addEventListener('click',function(){
+      state.view='idle'; state.paidCount=0; render();
+    });
+  }
+
+  /* overlays */
+  function overlayProcessing(text){
+    var ov=document.createElement('div');
+    ov.className='overlay'; ov.id='ov';
+    ov.innerHTML='<div class="spinner"></div><div class="ov-title">'+text+'</div>';
+    screen.appendChild(ov);
+  }
+  function overlayApproved(cb){
+    var ov=document.getElementById('ov');
+    if(ov) ov.remove();
+    var o=document.createElement('div');
+    o.className='overlay';
+    o.innerHTML='<div class="check">'+iconTick('#0fa968',40)+'</div><div class="ov-title">تمت الموافقة</div>';
+    screen.appendChild(o);
+    setTimeout(function(){ o.remove(); cb&&cb(); }, 850);
+  }
+  function overlayDoneSimple(){
+    var ov=document.getElementById('ov'); if(ov) ov.remove();
+    var o=document.createElement('div');
+    o.className='overlay';
+    o.innerHTML='<div class="check">'+iconTick('#0fa968',40)+'</div>'+
+      '<div class="ov-title">تمت الموافقة</div>'+
+      '<div class="ov-sub">تم الدفع بالكامل من طرف واحد.</div>'+
+      '<button class="btn btn-primary" id="ok" style="max-width:200px">تم</button>';
+    screen.appendChild(o);
+    document.getElementById('ok').addEventListener('click',function(){ o.remove(); state.view='idle'; render(); });
+  }
+
+  /* icons (inline svg) */
+  function iconSplit(c){return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.5 15.5"/><path d="M8.5 8.5 20 20"/></svg>';}
+  function iconCash(){return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg>';}
+  function iconCard(){return '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>';}
+  function iconWave(c){return '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="2" stroke-linecap="round"><path d="M8 8a6 6 0 0 1 0 8"/><path d="M11 5a10 10 0 0 1 0 14"/><path d="M5 11a3 3 0 0 1 0 2"/></svg>';}
+  function iconTick(c,sz){sz=sz||16;return '<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="'+c+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';}
+
+  render();
+})();
+</script>
+</body>
+</html>
